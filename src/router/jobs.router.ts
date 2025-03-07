@@ -21,7 +21,7 @@ jobRouter.patch("/:id", ensureJobExists,ensureNameJobExists, updateJobController
 jobRouter.patch("/:id/deactivate", ensureJobExists, deactivateJobController);
 jobRouter.post(
   "/:id/apply",
-  helmet(), // Aplica o Helmet
+  helmet({ crossOriginResourcePolicy: false }), // Aplica o Helmet
   limiter, // Aplica o Rate Limiter
   ensureJobExists, // Middleware existente
   sendApplicationUserController // Controller de envio de email

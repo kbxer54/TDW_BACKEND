@@ -9,6 +9,7 @@ import jobRouter from "./router/jobs.router";
 
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cors(corsOptions)); 
 app.use("/jobs", jobRouter);
