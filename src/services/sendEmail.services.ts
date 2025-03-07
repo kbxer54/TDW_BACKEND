@@ -10,7 +10,7 @@ export const sendApplicationEmail = async (
   const { name, email, message, portfolioLink, jobName } = data;
 
   const mailOptions = {
-    to: "eduardohairescampos@gmail.com",
+    to: "Hex@playthedarkwest.com",
     subject: `Application for job name: ${jobName}`,
     text: `  
       Name: ${name}  
@@ -36,7 +36,7 @@ export const sendContactEmail = async (
   const { email, message } = data;
 
   const mailOptions = {
-    to: "eduardohairescampos@gmail.com",
+    to: "Hex@playthedarkwest.com",
     subject: "Contact Form Message",
     text: `  
       E-mail: ${email}  
