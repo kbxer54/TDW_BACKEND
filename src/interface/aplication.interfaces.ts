@@ -3,3 +3,4 @@ import { applicationEmailSchema, contactEmailSchema } from "../schemas/aplicatio
 
 export type ApplicationEmailData = z.infer<typeof applicationEmailSchema>;
 export type ContactEmailData = z.infer<typeof contactEmailSchema>;
+export type GetGameEmailData = z.infer<typeof contactEmailSchema>;
