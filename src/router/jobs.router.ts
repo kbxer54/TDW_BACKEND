@@ -8,7 +8,7 @@ import {
 } from "../controllers/jobs.controllers";
 import { ensureJobExists } from "../middlewares/ensureJobExist.middleware";
 import { ensureNameJobExists } from "../middlewares/ensureNameJobExist.middleware";
-import { sendApplicationUserController, sendContactEmailController } from "../controllers/sendEmail.controllers";
+import { getGameEmailController, sendApplicationUserController, sendContactEmailController } from "../controllers/sendEmail.controllers";
 import helmet from "helmet";
 import { limiter } from "../middlewares/basedSecurity.middleware";
 
@@ -26,5 +26,6 @@ jobRouter.post(
   ensureJobExists, // Middleware existente
   sendApplicationUserController // Controller de envio de email
 );
-jobRouter.post("/contact",limiter ,sendContactEmailController);
+jobRouter.post("/user-info", limiter,getGameEmailController );
+jobRouter.post("/contact", limiter ,sendContactEmailController);
 export default jobRouter;
