@@ -76,10 +76,9 @@ export const toggleJobStatusService = async (
     throw new Error("Job not found");
   }
 
-  // Alterna o status do job
+
   job.isActive = !job.isActive;
 
-  // Salva a alteração no banco de dados
   await jobRepository.save(job);
 
   // Aplica o schema Zod para formatar o retorno
