@@ -47,26 +47,12 @@ export const sendContactEmail = async (
     `,
   };
 
-  // try {
-  //   await transporter.sendMail(mailOptions);
-  //   return { success: true, message: "Contact email sent successfully!" };
-  // } catch (error) {
-  //   return { success: false, error };
-  // }
-    try {
-      console.log(
-        "--- DEBUG: Simulating email send. If this log appears, the controller is working. ---"
-      );
-
-      // TEMPORARIAMENTE COMENTADO PARA O TESTE
-      // await transporter.sendMail(mailOptions);
-
-      // Retorne sucesso imediatamente sem tentar enviar
-      return { success: true, message: "DEBUG: Email sending was skipped!" };
-    } catch (error) {
-      // Este bloco provavelmente nem será atingido no teste
-      return { success: false, error };
-    }
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true, message: "Contact email sent successfully!" };
+  } catch (error) {
+    return { success: false, error };
+  }
 };
 
 export const getGameEmail = async (
