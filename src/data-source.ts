@@ -27,9 +27,11 @@ const settings = (): DataSourceOptions => {
     logging: true,
     entities: [entitiesPath],
     migrations: [migrationPath],
-    // ssl: {
-    //   rejectUnauthorized: false,
-    // },
+    ...(nodeEnv === "production" && {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    }),
   };
 };
 
