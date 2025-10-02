@@ -1,3 +1,4 @@
+// src/config/nodemailer.config.ts
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -11,7 +12,9 @@ const transporter = nodemailer.createTransport({
     clientSecret: process.env.GMAIL_CLIENT_SECRET,
     refreshToken: process.env.GMAIL_REFRESH_TOKEN,
   },
+  // ✅ ADICIONE ESTAS OPÇÕES DE TIMEOUT
+  connectionTimeout: 10 * 1000, // 10 segundos
+  socketTimeout: 10 * 1000, // 10 segundos
 });
 
-// ✅ A linha mais importante: exporte o 'transporter' para que outros arquivos possam usá-lo!
 export default transporter;
