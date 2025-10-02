@@ -1,13 +1,17 @@
-import dotenv from "dotenv";
-dotenv.config();
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE,
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    type: "OAuth2",
+    user: process.env.EMAIL_SERVICE,
+    clientId: process.env.GMAIL_CLIENT_ID,
+    clientSecret: process.env.GMAIL_CLIENT_SECRET,
+    refreshToken: process.env.GMAIL_REFRESH_TOKEN,
   },
 });
 
+// ✅ A linha mais importante: exporte o 'transporter' para que outros arquivos possam usá-lo!
 export default transporter;

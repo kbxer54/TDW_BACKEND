@@ -22,9 +22,8 @@ jobRouter.patch("/:id/deactivate", ensureJobExists, deactivateJobController);
 jobRouter.post(
   "/:id/apply",
   helmet({ crossOriginResourcePolicy: false }), // Aplica o Helmet
-  limiter, // Aplica o Rate Limiter
-  ensureJobExists, // Middleware existente
-  sendApplicationUserController // Controller de envio de email
+  limiter,
+  sendApplicationUserController 
 );
 jobRouter.post("/user-info", limiter,getGameEmailController );
 jobRouter.post("/contact", limiter ,sendContactEmailController);
