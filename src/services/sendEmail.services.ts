@@ -9,7 +9,7 @@ import {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const fromEmail = "onboarding@resend.dev";
+const fromEmail = "no-reply@playthedarkwest.comgit";
 const toEmail = process.env.EMAIL_USER
   ? process.env.EMAIL_USER
   : "Hex@playthedarkwest.com";
