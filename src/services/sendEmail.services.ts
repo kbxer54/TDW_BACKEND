@@ -1,5 +1,3 @@
-// src/services/sendEmail.services.ts
-
 import { Resend } from "resend";
 import {
   ApplicationEmailData,
@@ -15,7 +13,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = "contato@playthedarkwest.com";
 const toEmail = process.env.EMAIL_USER || "Hex@playthedarkwest.com";
 
-// ✅ CORREÇÃO: Adicionado 'data?: any' ao tipo de retorno
 export const getGameEmail = async (
   data: ContactEmailData
 ): Promise<{ success: boolean; message?: string; error?: any; data?: any }> => {
@@ -52,11 +49,9 @@ export const getGameEmail = async (
   }
 };
 
-// ✅ CORREÇÃO: Adicionado 'data?: any' ao tipo de retorno
 export const sendApplicationEmail = async (
   data: ApplicationEmailData
 ): Promise<{ success: boolean; message?: string; error?: any; data?: any }> => {
-  // Adicione os logs de depuração aqui como no exemplo acima quando precisar testar
   const { name, email, message, portfolioLink, jobName } = data;
   const { data: responseData, error } = await resend.emails.send({
     from: fromEmail,
@@ -78,11 +73,9 @@ export const sendApplicationEmail = async (
   };
 };
 
-// ✅ CORREÇÃO: Adicionado 'data?: any' ao tipo de retorno
 export const sendContactEmail = async (
   data: ContactEmailData
 ): Promise<{ success: boolean; message?: string; error?: any; data?: any }> => {
-  // Adicione os logs de depuração aqui como no exemplo acima quando precisar testar
   const { name, email, message, portfolioLink } = data;
   const { data: responseData, error } = await resend.emails.send({
     from: fromEmail,

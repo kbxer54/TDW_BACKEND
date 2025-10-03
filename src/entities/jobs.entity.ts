@@ -13,17 +13,17 @@ export class Job {
   id!: number;
 
   @Column({ type: "varchar", length: 255 })
-  title!: string; // Nome da vaga
+  title!: string; 
 
   @Column({ type: "text" })
-  description!: string; // Descrição da vaga
+  description!: string; 
 
-  @Column({ default: true }) // Por padrão, a vaga começa ativa
+  @Column({ default: true }) 
   isActive!: boolean;
 
   @CreateDateColumn({ type: "timestamp with time zone" })
-  createdAt?: Date; // Data de criação da vaga
+  createdAt?: Date;
 
   @OneToMany(() => User, (user) => user.job)
-  applicants?: User[]; // Lista de usuários interessados na vaga
+  applicants?: User[]; 
 }

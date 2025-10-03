@@ -7,7 +7,6 @@ const limiter = rateLimit({
   message: "Too many requests! Please try again later.",
 });
 
-// CORS middleware
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

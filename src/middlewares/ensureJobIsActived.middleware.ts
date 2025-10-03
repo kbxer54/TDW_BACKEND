@@ -9,21 +9,19 @@ export const ensureJobIsActive = async (
   response: Response,
   next: NextFunction
 ) => {
-  const { id } = request.params; // Pegando o ID do job vindo dos parâmetros da requisição
+  const { id } = request.params; 
 
   const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
 
-  // Verificar se o job existe
   const job = await jobRepository.findOne({
     where: { id: Number(id) },
   });
 
 
 
-  //Esta negando oque vir como resultado e esta afirmando que o job ja existe
   if (!job!.isActive) {
-    throw new AppError("Job is not active", 400); // Se o job não estiver ativo, lançar erro
+    throw new AppError("Job is not active", 400); 
   }
 
-  return next(); // Se o job estiver ativo, continuar para o próximo middleware ou controller
+  return next(); 
 };

@@ -48,17 +48,13 @@ export const updateJobService = async (
 ): Promise<TJobType> => {
   const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
 
-  // Busca o job pelo ID
   const job = await jobRepository.findOneBy({ id: jobId });
 
 
-  // Atualiza os campos do job
   const updatedJob = jobRepository.merge(job!, payload);
 
-  // Salva o job atualizado no banco de dados
   await jobRepository.save(updatedJob);
 
-  // Aplica o schema Zod para formatar o retorno
   const returnJob = jobSchema.parse(updatedJob);
 
   return returnJob;

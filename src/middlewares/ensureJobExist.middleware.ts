@@ -9,7 +9,7 @@ export const ensureJobExists = async (
   response: Response,
   next: NextFunction
 ) => {
-  const { id } = request.params; // Pegando o ID do job vindo dos parâmetros da requisição
+  const { id } = request.params; 
 
   const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
 
@@ -19,8 +19,8 @@ export const ensureJobExists = async (
   });
 
   if (!job) {
-    throw new AppError("Job not found", 404); // Se não encontrar o job, lançar erro
+    throw new AppError("Job not found", 404); 
   }
 
-  return next(); // Se o job existir, continuar para o próximo middleware ou controller
+  return next(); 
 };

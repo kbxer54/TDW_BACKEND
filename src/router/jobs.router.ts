@@ -10,7 +10,6 @@ import { ensureJobExists } from "../middlewares/ensureJobExist.middleware";
 import { ensureNameJobExists } from "../middlewares/ensureNameJobExist.middleware";
 import { getGameEmailController, sendApplicationUserController, sendContactEmailController } from "../controllers/sendEmail.controllers";
 import helmet from "helmet";
-import { limiter } from "../middlewares/basedSecurity.middleware";
 
 const jobRouter = Router();
 

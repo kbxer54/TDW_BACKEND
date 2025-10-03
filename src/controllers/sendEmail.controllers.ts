@@ -15,10 +15,8 @@ export const sendApplicationUserController = async (
   response: Response
 ): Promise<void> => {
   try {
-    // Valida os dados recebidos
     const validatedData = applicationEmailSchema.parse(request.body);
 
-    // Chama o serviço e espera o retorno
     const result = await sendApplicationEmail(validatedData);
 
     if (result.success) {
@@ -29,7 +27,6 @@ export const sendApplicationUserController = async (
         .json({ message: "Error sending email!", error: result.error });
     }
   } catch (error) {
-    // Extrai as mensagens de erro do zod
     if (error instanceof z.ZodError) {
       const errors = error.errors.map((err) => ({
         field: err.path.join("."),
@@ -53,10 +50,8 @@ export const sendContactEmailController = async (
   response: Response
 ): Promise<void> => {
   try {
-    // Valida os dados recebidos
     const validatedData = contactEmailSchema.parse(request.body);
 
-    // Chama o serviço e espera o retorno
     const result = await sendContactEmail(validatedData);
 
     if (result.success) {
@@ -67,7 +62,6 @@ export const sendContactEmailController = async (
         .json({ message: "Error sending contact email!", error: result.error });
     }
   } catch (error) {
-    // Extrai as mensagens de erro do zod
     if (error instanceof z.ZodError) {
       const errors = error.errors.map((err) => ({
         field: err.path.join("."),
@@ -90,10 +84,8 @@ export const getGameEmailController = async (
   response: Response
 ): Promise<void> => {
   try {
-    // Valida os dados recebidos
     const validatedData = contactEmailSchema.parse(request.body);
 
-    // Chama o serviço e espera o retorno
     const result = await getGameEmail(validatedData);
 
     if (result.success) {
@@ -104,7 +96,6 @@ export const getGameEmailController = async (
         .json({ message: "Error sending game email!", error: result.error });
     }
   } catch (error) {
-    // Extrai as mensagens de erro do zod
     if (error instanceof z.ZodError) {
       const errors = error.errors.map((err) => ({
         field: err.path.join("."),

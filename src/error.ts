@@ -17,11 +17,11 @@ export const errorHandler: ErrorRequestHandler = (
 ): void => {  
   if (error instanceof AppError) {  
     response.status(error.statusCode).json({ message: error.message });  
-    return; // Retorna vazio  
+    return; 
   }  
   if (error instanceof ZodError) {  
     response.status(400).json({ message: error.flatten().fieldErrors });  
-    return; // Retorna vazio  
+    return;  
   }  
   console.error(error);  
   response.status(500).json({ message: "Internal Server Error." });  
