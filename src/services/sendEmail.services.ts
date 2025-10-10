@@ -10,7 +10,7 @@ if (!process.env.RESEND_API_KEY) {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const fromEmail = "contato@playthedarkwest.com";
+const fromEmail = "contact@playthedarkwest.com";
 const toEmail = process.env.EMAIL_USER || "Hex@playthedarkwest.com";
 
 export const getGameEmail = async (
