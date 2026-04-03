@@ -15,7 +15,7 @@ const smartUrl = z
 export const userSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.email("Invalid email address"),
+  email:  z.string().email("Invalid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 
   // Aplica a transformação aqui

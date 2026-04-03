@@ -24,7 +24,7 @@ const smartUrl = z
 
 export const applicationEmailSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  email: z.email("Invalid email address"),
+  email:  z.string().email("Invalid email address"),
   message: z.string().optional(),
   portfolioLink: smartUrl.optional(), 
   jobName: z.string().min(1, "Job name is required"),
