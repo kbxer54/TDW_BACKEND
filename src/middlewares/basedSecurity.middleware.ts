@@ -1,5 +1,3 @@
-// src/middlewares/basedSecurity.middleware.ts
-
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
