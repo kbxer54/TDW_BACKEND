@@ -4,112 +4,51 @@ import {
   sendApplicationEmail,
   sendContactEmail,
 } from "../services/sendEmail.services";
-import {
-  applicationEmailSchema,
-  contactEmailSchema,
-} from "../schemas/aplication.schemas";
-import { z } from "zod";
+
+// Removemos as importações do Zod e Schemas daqui porque o Middleware vai resolver antes
 
 export const sendApplicationUserController = async (
   request: Request,
-  response: Response
+  response: Response,
 ): Promise<void> => {
-  try {
-    const validatedData = applicationEmailSchema.parse(request.body);
+  // O middleware ensureDataIsValid já garantiu que request.body está perfeito
+  const result = await sendApplicationEmail(request.body);
 
-    const result = await sendApplicationEmail(validatedData);
-
-    if (result.success) {
-      response.status(200).json({ message: result.message });
-    } else {
-      response
-        .status(500)
-        .json({ message: "Error sending email!", error: result.error });
-    }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => ({
-        field: err.path.join("."),
-        message: err.message,
-      }));
-      response.status(400).json({
-        message: "Validation error",
-        errors,
-      });
-    } else {
-      response.status(400).json({
-        message: "Validation error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  if (result.success) {
+    response.status(200).json({ message: result.message });
+  } else {
+    response
+      .status(500)
+      .json({ message: "Error sending email!", error: result.error });
   }
 };
 
 export const sendContactEmailController = async (
   request: Request,
-  response: Response
+  response: Response,
 ): Promise<void> => {
-  try {
-    const validatedData = contactEmailSchema.parse(request.body);
+  const result = await sendContactEmail(request.body);
 
-    const result = await sendContactEmail(validatedData);
-
-    if (result.success) {
-      response.status(200).json({ message: result.message });
-    } else {
-      response
-        .status(500)
-        .json({ message: "Error sending contact email!", error: result.error });
-    }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => ({
-        field: err.path.join("."),
-        message: err.message,
-      }));
-      response.status(400).json({
-        message: "Validation error",
-        errors,
-      });
-    } else {
-      response.status(400).json({
-        message: "Validation error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  if (result.success) {
+    response.status(200).json({ message: result.message });
+  } else {
+    response
+      .status(500)
+      .json({ message: "Error sending contact email!", error: result.error });
   }
 };
+
 export const getGameEmailController = async (
   request: Request,
-  response: Response
+  response: Response,
 ): Promise<void> => {
-  try {
-    const validatedData = contactEmailSchema.parse(request.body);
+  const result = await getGameEmail(request.body);
 
-    const result = await getGameEmail(validatedData);
-
-    if (result.success) {
-      response.status(200).json({ message: result.message });
-    } else {
-      response
-        .status(500)
-        .json({ message: "Error sending game email!", error: result.error });
-    }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => ({
-        field: err.path.join("."),
-        message: err.message,
-      }));
-      response.status(400).json({
-        message: "Validation error",
-        errors,
-      });
-    } else {
-      response.status(400).json({
-        message: "Validation error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  if (result.success) {
+    response.status(200).json({ message: result.message });
+  } else {
+    response
+      .status(500)
+      .json({ message: "Error sending game email!", error: result.error });
   }
 };

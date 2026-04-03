@@ -1,10 +1,25 @@
 import { z } from "zod";
 
+// Mesmo truque do Front-end
+const smartUrl = z
+  .string()
+  .transform((val) => {
+    if (!val) return "";
+    if (!val.startsWith("http")) {
+      return `https://${val}`;
+    }
+    return val;
+  })
+  .pipe(z.union([z.string().url("Invalid URL format"), z.literal("")]));
+
 export const userSchema = z.object({
-  id: z.number().optional(), // O ID será gerado automaticamente pelo banco
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  email: z.string().email("E-mail inválido"),
-  message: z.string().min(10, "A mensagem deve ter pelo menos 10 caracteres"),
-  portfolioLink: z.string().url("URL inválida").optional(),
-  createdAt: z.date().default(new Date()), // Adicionando data de criação
+  id: z.number().optional(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+
+  // Aplica a transformação aqui
+  portfolioLink: smartUrl.optional(),
+
+  createdAt: z.date().default(() => new Date()),
 });
