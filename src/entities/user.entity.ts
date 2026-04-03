@@ -1,32 +1,43 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-} from "typeorm";
-import { Job } from "./jobs.entity";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert, BeforeUpdate } from "typeorm";
+import * as bcrypt from "bcryptjs";
+import { Role } from "../enums/role";
 
+/*
+Represents a system user (Admin or Developer) who can access the dashboard.
+Automatically hashes the password before saving it to the database.
+
+Representa um usuário do sistema (Admin ou Desenvolvedor) que pode acessar o painel.
+Faz o hash automático da senha antes de salvá-la no banco de dados.
+*/
 @Entity("users")
 export class User {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-  @Column({ type: "varchar", length: 255 })
+  @Column()
   name!: string;
 
-  @Column({ type: "varchar", length: 255, unique: true })
+  @Column({ unique: true })
   email!: string;
 
-  @Column({ type: "text" })
-  message!: string;
+  @Column()
+  password!: string;
 
-  @Column({ type: "varchar", length: 255, nullable: true })
-  portfolioLink?: string;
+  @Column({
+    type: "enum",
+    enum: Role,
+    default: Role.DEVELOPER,
+  })
+  role!: Role;
 
-  @CreateDateColumn({ type: "timestamp with time zone" })
-  createdAt!: Date;
+  @CreateDateColumn()
+  created_at!: Date;
 
-  @ManyToOne(() => Job, (job) => job.applicants, { nullable: false })
-  job?: Job; // Relação com a vaga
+  @BeforeInsert()
+  @BeforeUpdate()
+  hashPassword() {
+    if (this.password) {
+      this.password = bcrypt.hashSync(this.password, 10);
+    }
+  }
 }

@@ -23,7 +23,4 @@ export class Job {
 
   @CreateDateColumn({ type: "timestamp with time zone" })
   createdAt?: Date; // Data de criação da vaga
-
-  @OneToMany(() => User, (user) => user.job)
-  applicants?: User[]; // Lista de usuários interessados na vaga
 }
