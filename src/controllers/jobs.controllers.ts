@@ -6,32 +6,23 @@ import {
   updateJobService,
   toggleJobStatusService,
 } from "../services/jobs.services";
-import { AppDataSource } from "../data-source";
 
 export const createJobController = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const job = await createJobService(req.body);
-    res.status(201).json(job);
-  } catch (error) {
-    next(error); // Passa o erro para o errorHandler  
-  }
-}
+  const job = await createJobService(req.body);
+  res.status(201).json(job);
+};
 
 export const getAllJobsController = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const jobs = await getAllJobsService();
-    res.status(200).json(jobs);
-  } catch (error) {
-    next(error);
-  }
+  const jobs = await getAllJobsService();
+  res.status(200).json(jobs);
 }; 
 
 export const getJobByIdController = async (
@@ -39,12 +30,8 @@ export const getJobByIdController = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const job = await getJobByIdService(Number(req.params.id));
-    res.status(200).json(job);
-  } catch (error) {
-    next(error);
-  }
+  const job = await getJobByIdService(Number(req.params.id));
+  res.status(200).json(job);
 };
 
 export const updateJobController = async (
@@ -52,12 +39,8 @@ export const updateJobController = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const job = await updateJobService(Number(req.params.id), req.body);
-    res.status(200).json(job);
-  } catch (error) {
-    next(error);
-  }
+  const job = await updateJobService(Number(req.params.id), req.body);
+  res.status(200).json(job);
 };
 
 export const deactivateJobController = async (
@@ -65,10 +48,6 @@ export const deactivateJobController = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const job = await toggleJobStatusService(Number(req.params.id));
-    res.status(200).json({ message: "Job deactivated successfully", job });
-  } catch (error) {
-    next(error);
-  }
+  const job = await toggleJobStatusService(Number(req.params.id));
+  res.status(200).json({ message: "Job deactivated successfully", job });
 };

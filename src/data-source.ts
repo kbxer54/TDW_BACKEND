@@ -24,7 +24,7 @@ const settings = (): DataSourceOptions => {
     type: "postgres",
     url: dbUrl,
     synchronize: false,
-    logging: true,
+    logging: nodeEnv !== "production",
     entities: [entitiesPath],
     migrations: [migrationPath],
     ...(nodeEnv === "production" && {

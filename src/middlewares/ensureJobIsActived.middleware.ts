@@ -17,9 +17,11 @@ export const ensureJobIsActive = async (
     where: { id: Number(id) },
   });
 
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
 
-
-  if (!job!.isActive) {
+  if (!job.isActive) {
     throw new AppError("Job is not active", 400); 
   }
 

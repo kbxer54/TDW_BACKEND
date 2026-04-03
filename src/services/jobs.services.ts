@@ -3,6 +3,7 @@
 import { AppDataSource } from "../data-source";
 import { Job } from "../entities/jobs.entity";
 import { Repository } from "typeorm";
+import { AppError } from "../error";
 import {
   TAllJobsSchemasResponse,
   TJobSchemaRequest,
@@ -10,13 +11,11 @@ import {
 } from "../interface/jobs.interfaces";
 import { allJobsSchemasResponse, jobSchema } from "../schemas/job.schemas";
 
-
-const jobRepository = AppDataSource.getRepository(Job);
-
-export const createJobService = async (data: Partial<Job>): Promise<Job> => {
+export const createJobService = async (data: Partial<Job>): Promise<TJobType> => {
+  const jobRepository = AppDataSource.getRepository(Job);
   const job = jobRepository.create(data);
   await jobRepository.save(job);
-  return job;
+  return jobSchema.parse(job);
 };
 
 export const getAllJobsService =
@@ -36,6 +35,9 @@ export const getJobByIdService = async (jobId: number): Promise<TJobType> => {
   const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
 
   const job = await jobRepository.findOneBy({ id: jobId });
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
 
   const returnJob = jobSchema.parse(job);
 
@@ -49,9 +51,11 @@ export const updateJobService = async (
   const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
 
   const job = await jobRepository.findOneBy({ id: jobId });
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
 
-
-  const updatedJob = jobRepository.merge(job!, payload);
+  const updatedJob = jobRepository.merge(job, payload);
 
   await jobRepository.save(updatedJob);
 
@@ -69,7 +73,7 @@ export const toggleJobStatusService = async (
   const job = await jobRepository.findOneBy({ id: jobId });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new AppError("Job not found", 404);
   }
 
 

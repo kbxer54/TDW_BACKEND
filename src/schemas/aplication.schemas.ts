@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const smartUrl = z
   .string()
+  .trim()
   .transform((val) => {
     if (!val) return "";
     if (!val.startsWith("http")) {
@@ -22,19 +23,52 @@ const smartUrl = z
     ]),
   );
 
-export const applicationEmailSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email:  z.string().email("Invalid email address"),
-  message: z.string().optional(),
-  portfolioLink: smartUrl.optional(), 
-  jobName: z.string().min(1, "Job name is required"),
+export const applicationEmailSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required"),
+    email: z.string().trim().email("Invalid email address"),
+    message: z.string().trim().optional(),
+    coverLetter: z.string().trim().optional(),
+    portfolioLink: smartUrl.optional(),
+    portfolioUrl: smartUrl.optional(),
+    jobName: z.string().trim().min(1, "Job name is required").optional(),
+  })
+  .superRefine((data, context) => {
+    const normalizedMessage = data.message || data.coverLetter || "";
+
+    if (!normalizedMessage) {
+      context.addIssue({
+        code: "custom",
+        path: ["message"],
+        message: "Message is required",
+      });
+      return;
+    }
+
+    if (normalizedMessage.length < 10) {
+      context.addIssue({
+        code: "custom",
+        path: ["message"],
+        message: "Message must be at least 10 characters",
+      });
+    }
+  })
+  .transform((data) => ({
+    name: data.name,
+    email: data.email,
+    message: (data.message || data.coverLetter || "").trim(),
+    portfolioLink: data.portfolioLink || data.portfolioUrl || undefined,
+    jobName: data.jobName?.trim() || undefined,
+  }));
+
+export const contactEmailSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.string().trim().email("Invalid email address"),
+  subject: z.string().trim().min(1, "Subject is required"),
+  message: z.string().trim().min(1, "Message is required"),
 });
 
-export const contactEmailSchema = applicationEmailSchema.omit({
-  jobName: true,
-});
-
-export const getGameSchema = applicationEmailSchema.omit({
-  jobName: true,
-  portfolioLink: true,
+export const getGameSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.string().trim().email("Invalid email address"),
 });

@@ -4,7 +4,7 @@ import cors from "cors";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 15,
-  message: "Too many requests! Please try again later.",
+  message: { message: "Too many requests! Please try again later." },
 });
 
 const getOrigin = (): string | string[] => {

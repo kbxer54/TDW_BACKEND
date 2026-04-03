@@ -1,6 +1,10 @@
 import { z } from "zod";
-import { applicationEmailSchema, contactEmailSchema } from "../schemas/aplication.schemas";
+import {
+  applicationEmailSchema,
+  contactEmailSchema,
+  getGameSchema,
+} from "../schemas/aplication.schemas";
 
 export type ApplicationEmailData = z.infer<typeof applicationEmailSchema>;
 export type ContactEmailData = z.infer<typeof contactEmailSchema>;
-export type GetGameEmailData = z.infer<typeof contactEmailSchema>;
+export type GetGameEmailData = z.infer<typeof getGameSchema>;
