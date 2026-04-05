@@ -21,13 +21,17 @@ import {
 } from "../controllers/email.controllers";
 import helmet from "helmet";
 import { limiter } from "../middlewares/basedSecurity.middleware";
+import { authMiddleware } from "../middlewares/auth.middleware";
 import { ensureJobIsActive } from "../middlewares/ensureJobIsActived.middleware";
+import { roleMiddleware } from "../middlewares/role.middleware";
 import { jobSchemaRequest } from "../schemas/job.schemas";
 
 const jobRouter = Router();
 
 jobRouter.post(
   "/",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
   ensureDataIsValid(jobSchemaRequest),
   ensureJobTitleAvailable,
   createJobController,
@@ -36,12 +40,20 @@ jobRouter.get("/", getAllJobsController);
 jobRouter.get("/:id", ensureJobExists, getJobByIdController);
 jobRouter.patch(
   "/:id",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
   ensureDataIsValid(jobSchemaRequest.partial()),
   ensureJobExists,
   ensureJobTitleAvailable,
   updateJobController,
 );
-jobRouter.patch("/:id/deactivate", ensureJobExists, deactivateJobController);
+jobRouter.patch(
+  "/:id/deactivate",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
+  ensureJobExists,
+  deactivateJobController,
+);
 
 jobRouter.post(
   "/:id/apply",
