@@ -8,16 +8,16 @@ import {
   updateAccountByAdminController,
   updateOwnProfileController,
 } from "../controllers/auth.controllers";
-import { authMiddleware } from "../middlewares/auth.middleware";
 import { limiter } from "../middlewares/basedSecurity.middleware";
 import { ensureDataIsValid } from "../middlewares/ensureDataIsValid.middleware";
-import { roleMiddleware } from "../middlewares/role.middleware";
 import {
   adminAccountUpdateSchema,
   loginSchema,
   registerSchema,
   selfProfileUpdateSchema,
 } from "../schemas/auth.schemas";
+import { authMiddleware } from "../middlewares/auth.middleware";
+import { roleMiddleware } from "../middlewares/role.middleware";
 
 const authRouter = Router();
 
@@ -33,8 +33,6 @@ authRouter.post(
   "/register",
   helmet({ crossOriginResourcePolicy: false }),
   limiter,
-  authMiddleware,
-  roleMiddleware(["ADMIN", "LEADER"]),
   ensureDataIsValid(registerSchema),
   registerController,
 );
