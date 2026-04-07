@@ -259,7 +259,7 @@ export const broadcastPublicationCreated = async (
   const { subject, html, text, previewText } =
     buildPublicationBroadcastContent(publication);
 
-  const { error } = await resend.broadcasts.create({
+  const createResponse = await resend.broadcasts.create({
     audienceId,
     from: senderEmail,
     subject,
@@ -267,10 +267,19 @@ export const broadcastPublicationCreated = async (
     text,
     previewText,
     name: publication.slug,
-    send: true,
   });
 
-  if (error) {
-    throw error;
+  if (createResponse.error) {
+    throw createResponse.error;
+  }
+
+  if (!createResponse.data?.id) {
+    throw new AppError("Newsletter broadcast could not be created.", 500);
+  }
+
+  const sendResponse = await resend.broadcasts.send(createResponse.data.id);
+
+  if (sendResponse.error) {
+    throw sendResponse.error;
   }
 };
