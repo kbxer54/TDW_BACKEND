@@ -9,6 +9,7 @@ import { errorHandler } from "./error";
 import { corsOptions } from "./middlewares/basedSecurity.middleware";
 import authRouter from "./router/auth.router";
 import jobRouter from "./router/jobs.router";
+import newsletterRouter from "./router/newsletter.router";
 import publicationRouter from "./router/publications.router";
 import subscribeRouter from "./router/subscribe.router";
 
@@ -27,6 +28,7 @@ app.use("/auth", authRouter);
 app.use("/jobs", jobRouter);
 app.use("/publications", publicationRouter);
 app.use("/subscribe", subscribeRouter);
+app.use("/newsletter", newsletterRouter);
 app.use(
   "/uploads/publications",
   express.static(publicationStaticDirectory),
