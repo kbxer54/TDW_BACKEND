@@ -107,19 +107,25 @@ export const registerAccountService = async (
   actor?: AuthenticatedAccount,
 ) => {
   const repository = accountRepository();
+  await ensureEmailIsAvailable(data.email);
+  const requestedRole: AccountRole = data.role || "DEVELOPER";
 
   if (!actor) {
-    throw new AppError("Only admins or leaders can create accounts", 403);
+    const publicAccount = repository.create({
+      name: data.name,
+      email: data.email,
+      password: await bcrypt.hash(data.password, 12),
+      role: requestedRole,
+    });
+
+    await repository.save(publicAccount);
+
+    return sanitizeAccount(publicAccount);
   }
 
   if (actor.role !== "ADMIN" && actor.role !== "LEADER") {
     throw new AppError("Only admins or leaders can create accounts", 403);
   }
-
-  await ensureEmailIsAvailable(data.email);
-
-  const hashedPassword = await bcrypt.hash(data.password, 12);
-  const requestedRole: AccountRole = data.role || "DEVELOPER";
 
   if (actor.role === "LEADER" && requestedRole !== "DEVELOPER") {
     throw new AppError("Leaders can create only developer accounts", 403, [
@@ -135,7 +141,7 @@ export const registerAccountService = async (
   const account = repository.create({
     name: data.name,
     email: data.email,
-    password: hashedPassword,
+    password: await bcrypt.hash(data.password, 12),
     role,
   });
 
