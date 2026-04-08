@@ -24,6 +24,9 @@ export class Account {
   @Column({ type: "varchar", length: 32, default: "DEVELOPER" })
   role!: AccountRole;
 
+  @Column({ type: "boolean", default: true })
+  isActive!: boolean;
+
   @CreateDateColumn({ type: "timestamp with time zone" })
   createdAt!: Date;
 

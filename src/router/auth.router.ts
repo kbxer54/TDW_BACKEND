@@ -1,7 +1,9 @@
 import { Router } from "express";
 import helmet from "helmet";
 import {
+  deactivateAccountController,
   deleteAccountByAdminController,
+  hardDeleteAccountController,
   getProfileController,
   loginController,
   registerController,
@@ -34,7 +36,7 @@ authRouter.post(
   helmet({ crossOriginResourcePolicy: false }),
   limiter,
   authMiddleware,
-  roleMiddleware(["ADMIN", "LEADER"]),
+  roleMiddleware(["ADMIN"]),
   ensureDataIsValid(registerSchema),
   registerController,
 );
@@ -56,11 +58,25 @@ authRouter.patch(
   updateAccountByAdminController,
 );
 
+authRouter.patch(
+  "/users/:id/deactivate",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
+  deactivateAccountController,
+);
+
 authRouter.delete(
   "/users/:id",
   authMiddleware,
-  roleMiddleware(["ADMIN"]),
+  roleMiddleware(["ADMIN", "LEADER"]),
   deleteAccountByAdminController,
+);
+
+authRouter.delete(
+  "/users/:id/permanent",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
+  hardDeleteAccountController,
 );
 
 export default authRouter;

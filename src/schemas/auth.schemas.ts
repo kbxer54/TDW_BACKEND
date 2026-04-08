@@ -73,6 +73,7 @@ export const accountResponseSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   role: accountRoleSchema,
+  isActive: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

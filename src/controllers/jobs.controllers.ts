@@ -3,6 +3,7 @@ import {
   createJobService,
   getAllJobsService,
   getJobByIdService,
+  hardDeleteJobService,
   updateJobService,
   toggleJobStatusService,
 } from "../services/jobs.services";
@@ -50,4 +51,13 @@ export const deactivateJobController = async (
 ): Promise<void> => {
   const job = await toggleJobStatusService(Number(req.params.id));
   res.status(200).json({ message: "Job deactivated successfully", job });
+};
+
+export const hardDeleteJobController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  await hardDeleteJobService(Number(req.params.id));
+  res.status(200).json({ message: "Job deleted successfully" });
 };

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createJobController,
+  hardDeleteJobController,
   getAllJobsController,
   getJobByIdController,
   updateJobController,
@@ -53,6 +54,14 @@ jobRouter.patch(
   roleMiddleware(["ADMIN", "LEADER"]),
   ensureJobExists,
   deactivateJobController,
+);
+
+jobRouter.delete(
+  "/:id/permanent",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "LEADER"]),
+  ensureJobExists,
+  hardDeleteJobController,
 );
 
 jobRouter.post(

@@ -39,6 +39,7 @@ const sanitizeAccount = (account: Account): AuthenticatedAccount => ({
   name: account.name,
   email: account.email,
   role: account.role,
+  isActive: account.isActive,
   createdAt: account.createdAt,
   updatedAt: account.updatedAt,
 });
@@ -47,7 +48,7 @@ const findAccountWithPasswordByEmail = async (email: string) =>
   accountRepository()
     .createQueryBuilder("account")
     .addSelect("account.password")
-    .where("account.email = :email", { email })
+    .where("LOWER(account.email) = LOWER(:email)", { email })
     .getOne();
 
 const findAccountWithPasswordById = async (id: number) =>
@@ -58,9 +59,10 @@ const findAccountWithPasswordById = async (id: number) =>
     .getOne();
 
 const ensureEmailIsAvailable = async (email: string, currentId?: number) => {
-  const existingAccount = await accountRepository().findOne({
-    where: { email },
-  });
+  const existingAccount = await accountRepository()
+    .createQueryBuilder("account")
+    .where("LOWER(account.email) = LOWER(:email)", { email })
+    .getOne();
 
   if (existingAccount && existingAccount.id !== currentId) {
     throw new AppError("Email already in use", 409, [
@@ -69,12 +71,12 @@ const ensureEmailIsAvailable = async (email: string, currentId?: number) => {
   }
 };
 
-const countAdminAccounts = async () =>
+const countActiveAdminAccounts = async () =>
   accountRepository().count({
-    where: { role: "ADMIN" },
+    where: { role: "ADMIN", isActive: true },
   });
 
-const ensureAdminRoleCanChange = async (
+const ensureActiveAdminRemains = async (
   account: Account,
   nextRole?: AccountRole,
 ) => {
@@ -82,10 +84,27 @@ const ensureAdminRoleCanChange = async (
     return;
   }
 
-  const adminCount = await countAdminAccounts();
+  const adminCount = await countActiveAdminAccounts();
 
   if (adminCount <= 1) {
     throw new AppError("At least one admin account must remain", 400);
+  }
+};
+
+const ensureActorCanManageTargetAccount = (
+  actor: AuthenticatedAccount,
+  target: Account,
+) => {
+  if (actor.id === target.id) {
+    throw new AppError("You cannot manage your own account this way", 400);
+  }
+
+  if (actor.role === "DEVELOPER") {
+    throw new AppError("You do not have permission to perform this action", 403);
+  }
+
+  if (actor.role === "LEADER" && target.role !== "DEVELOPER") {
+    throw new AppError("You do not have permission to perform this action", 403);
   }
 };
 
@@ -108,12 +127,8 @@ export const registerAccountService = async (
 ) => {
   const repository = accountRepository();
 
-  if (!actor) {
-    throw new AppError("Only admins or leaders can create accounts", 403);
-  }
-
-  if (actor.role !== "ADMIN" && actor.role !== "LEADER") {
-    throw new AppError("Only admins or leaders can create accounts", 403);
+  if (!actor || actor.role !== "ADMIN") {
+    throw new AppError("Only admins can create accounts", 403);
   }
 
   await ensureEmailIsAvailable(data.email);
@@ -121,22 +136,11 @@ export const registerAccountService = async (
   const hashedPassword = await bcrypt.hash(data.password, 12);
   const requestedRole: AccountRole = data.role || "DEVELOPER";
 
-  if (actor.role === "LEADER" && requestedRole !== "DEVELOPER") {
-    throw new AppError("Leaders can create only developer accounts", 403, [
-      {
-        field: "role",
-        message: "Leaders can create only developer accounts",
-      },
-    ]);
-  }
-
-  const role: AccountRole = actor.role === "LEADER" ? "DEVELOPER" : requestedRole;
-
   const account = repository.create({
     name: data.name,
     email: data.email,
     password: hashedPassword,
-    role,
+    role: requestedRole,
   });
 
   await repository.save(account);
@@ -147,7 +151,7 @@ export const registerAccountService = async (
 export const loginService = async (data: LoginInput) => {
   const account = await findAccountWithPasswordByEmail(data.email);
 
-  if (!account) {
+  if (!account || !account.isActive) {
     throw new AppError("Invalid email or password", 401);
   }
 
@@ -190,6 +194,19 @@ export const getAccountProfileService = async (accountId: number) => {
 
   if (!account) {
     throw new AppError("Account not found", 404);
+  }
+
+  return sanitizeAccount(account);
+};
+
+export const getAuthenticatedAccountService = async (accountId: number) => {
+  const account = await accountRepository().findOneBy({
+    id: accountId,
+    isActive: true,
+  });
+
+  if (!account) {
+    throw new AppError("Authentication required", 401);
   }
 
   return sanitizeAccount(account);
@@ -248,7 +265,7 @@ export const updateAccountByAdminService = async (
     throw new AppError("Account not found", 404);
   }
 
-  await ensureAdminRoleCanChange(account, data.role);
+  await ensureActiveAdminRemains(account, data.role);
 
   if (data.email) {
     await ensureEmailIsAvailable(data.email, account.id);
@@ -271,7 +288,10 @@ export const updateAccountByAdminService = async (
   return sanitizeAccount(account);
 };
 
-export const deleteAccountByAdminService = async (accountId: number) => {
+export const deactivateAccountService = async (
+  accountId: number,
+  actor: AuthenticatedAccount,
+) => {
   const repository = accountRepository();
   const account = await repository.findOneBy({ id: accountId });
 
@@ -279,6 +299,31 @@ export const deleteAccountByAdminService = async (accountId: number) => {
     throw new AppError("Account not found", 404);
   }
 
-  await ensureAdminRoleCanChange(account, "DEVELOPER");
+  ensureActorCanManageTargetAccount(actor, account);
+
+  if (!account.isActive) {
+    throw new AppError("Account is already inactive", 400);
+  }
+
+  await ensureActiveAdminRemains(account, "DEVELOPER");
+
+  account.isActive = false;
+  await repository.save(account);
+};
+
+export const hardDeleteAccountService = async (
+  accountId: number,
+  actor: AuthenticatedAccount,
+) => {
+  const repository = accountRepository();
+  const account = await repository.findOneBy({ id: accountId });
+
+  if (!account) {
+    throw new AppError("Account not found", 404);
+  }
+
+  ensureActorCanManageTargetAccount(actor, account);
+  await ensureActiveAdminRemains(account, "DEVELOPER");
+
   await repository.remove(account);
 };

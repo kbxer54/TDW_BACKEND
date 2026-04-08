@@ -86,4 +86,28 @@ export const toggleJobStatusService = async (
 
   return returnJob;
 };
+
+export const hardDeleteJobService = async (jobId: number): Promise<void> => {
+  const jobRepository: Repository<Job> = AppDataSource.getRepository(Job);
+
+  const job = await jobRepository.findOne({
+    where: { id: jobId },
+    relations: {
+      applicants: true,
+    },
+  });
+
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
+
+  if ((job.applicants || []).length > 0) {
+    throw new AppError(
+      "This job has linked applications and cannot be permanently deleted",
+      400,
+    );
+  }
+
+  await jobRepository.remove(job);
+};
  

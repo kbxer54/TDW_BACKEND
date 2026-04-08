@@ -3,7 +3,8 @@ import {
   RequestWithAuth,
 } from "../interface/auth.interfaces";
 import {
-  deleteAccountByAdminService,
+  deactivateAccountService,
+  hardDeleteAccountService,
   getAccountProfileService,
   loginService,
   registerAccountService,
@@ -58,6 +59,25 @@ export const deleteAccountByAdminController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  await deleteAccountByAdminService(Number(request.params.id));
+  const authRequest = request as RequestWithAuth;
+  await deactivateAccountService(Number(request.params.id), authRequest.authAccount!);
+  response.status(200).json({ message: "Account deactivated successfully" });
+};
+
+export const deactivateAccountController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const authRequest = request as RequestWithAuth;
+  await deactivateAccountService(Number(request.params.id), authRequest.authAccount!);
+  response.status(200).json({ message: "Account deactivated successfully" });
+};
+
+export const hardDeleteAccountController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const authRequest = request as RequestWithAuth;
+  await hardDeleteAccountService(Number(request.params.id), authRequest.authAccount!);
   response.status(200).json({ message: "Account deleted successfully" });
 };

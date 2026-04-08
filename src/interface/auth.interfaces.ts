@@ -15,6 +15,7 @@ export interface AuthenticatedAccount {
   name: string;
   email: string;
   role: AccountRole;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

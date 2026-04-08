@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../error";
 import { RequestWithAuth } from "../interface/auth.interfaces";
-import { getAccountProfileService, verifyAuthToken } from "../services/auth.services";
+import {
+  getAuthenticatedAccountService,
+  verifyAuthToken,
+} from "../services/auth.services";
 
 const extractBearerToken = (authorizationHeader?: string) => {
   if (!authorizationHeader) {
@@ -29,7 +32,7 @@ export const authMiddleware = async (
   }
 
   const payload = verifyAuthToken(token);
-  request.authAccount = await getAccountProfileService(Number(payload.sub));
+  request.authAccount = await getAuthenticatedAccountService(Number(payload.sub));
 
   return next();
 };
