@@ -16,8 +16,17 @@ import {
   publicationCreateSchema,
   publicationUpdateSchema,
 } from "../schemas/publication.schemas";
+import { publicCache } from "../middlewares/cache.middleware";
 
 const publicationRouter = Router();
+const publicationListCache = publicCache({
+  maxAgeSeconds: 60,
+  staleWhileRevalidateSeconds: 300,
+});
+const publicationDetailCache = publicCache({
+  maxAgeSeconds: 300,
+  staleWhileRevalidateSeconds: 600,
+});
 
 publicationRouter.post(
   "/",
@@ -28,9 +37,13 @@ publicationRouter.post(
   createPublicationController,
 );
 
-publicationRouter.get("/", getAllPublicationsController);
-publicationRouter.get("/slug/:slug", getPublicationBySlugController);
-publicationRouter.get("/:id", getPublicationByIdController);
+publicationRouter.get("/", publicationListCache, getAllPublicationsController);
+publicationRouter.get(
+  "/slug/:slug",
+  publicationDetailCache,
+  getPublicationBySlugController,
+);
+publicationRouter.get("/:id", publicationDetailCache, getPublicationByIdController);
 
 publicationRouter.patch(
   "/:id",

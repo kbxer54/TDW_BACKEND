@@ -22,12 +22,17 @@ import {
 } from "../controllers/email.controllers";
 import helmet from "helmet";
 import { limiter } from "../middlewares/basedSecurity.middleware";
+import { publicCache } from "../middlewares/cache.middleware";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { ensureJobIsActive } from "../middlewares/ensureJobIsActived.middleware";
 import { roleMiddleware } from "../middlewares/role.middleware";
 import { jobSchemaRequest } from "../schemas/job.schemas";
 
 const jobRouter = Router();
+const publicReadCache = publicCache({
+  maxAgeSeconds: 60,
+  staleWhileRevalidateSeconds: 300,
+});
 
 jobRouter.post(
   "/",
@@ -37,8 +42,8 @@ jobRouter.post(
   ensureJobTitleAvailable,
   createJobController,
 );
-jobRouter.get("/", getAllJobsController);
-jobRouter.get("/:id", ensureJobExists, getJobByIdController);
+jobRouter.get("/", publicReadCache, getAllJobsController);
+jobRouter.get("/:id", publicReadCache, ensureJobExists, getJobByIdController);
 jobRouter.patch(
   "/:id",
   authMiddleware,
