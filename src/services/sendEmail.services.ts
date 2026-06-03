@@ -1,54 +1,41 @@
-import { Resend } from "resend";
 import {
   ApplicationEmailData,
   ContactEmailData,
   GetGameEmailData,
 } from "../interface/aplication.interfaces";
-import { AppError } from "../error";
-
-const getResendClient = () => {
-  const apiKey = process.env.RESEND_API_KEY;
-
-  if (!apiKey) {
-    throw new AppError("Email service is not configured", 500);
-  }
-
-  return new Resend(apiKey);
-};
+import { enqueueEmailJob } from "./emailQueue.services";
 
 const fromEmail =
   process.env.SENDER_EMAIL || "contact@playthedarkwest.com";
 const toEmail = process.env.EMAIL_USER || fromEmail;
 
-const sendEmailOrThrow = async ({
+const queueEmailOrThrow = async ({
+  type,
   subject,
   text,
   replyTo,
 }: {
+  type: "APPLICATION" | "CONTACT" | "USER_INFO";
   subject: string;
   text: string;
   replyTo?: string;
 }) => {
-  const resend = getResendClient();
-  const { error } = await resend.emails.send({
+  await enqueueEmailJob({
+    type,
     from: fromEmail,
     to: toEmail,
     subject,
     text,
     ...(replyTo ? { replyTo } : {}),
   });
-
-  if (error) {
-    console.error("Email provider error:", error.name || "ResendError");
-    throw new AppError("We couldn't send the email right now.", 500);
-  }
 };
 
 export const getGameEmail = async (
   data: GetGameEmailData
 ): Promise<{ message: string }> => {
   const { name, email } = data;
-  await sendEmailOrThrow({
+  await queueEmailOrThrow({
+    type: "USER_INFO",
     subject: "Game Form Message",
     text: `
         ${name.charAt(0).toUpperCase() + name.slice(1)} has joined the hunters!
@@ -67,7 +54,8 @@ export const sendApplicationEmail = async (
   const { name, email, message, portfolioLink, jobName } = data;
   const resolvedJobTitle = jobTitle || jobName || "The Dark West";
 
-  await sendEmailOrThrow({
+  await queueEmailOrThrow({
+    type: "APPLICATION",
     subject: `Application for job: ${resolvedJobTitle}`,
     text: `
         Name: ${name}
@@ -87,7 +75,8 @@ export const sendContactEmail = async (
 ): Promise<{ message: string }> => {
   const { name, email, message, subject } = data;
 
-  await sendEmailOrThrow({
+  await queueEmailOrThrow({
+    type: "CONTACT",
     subject: `Contact Form: ${subject}`,
     text: `
         Name: ${name}

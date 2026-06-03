@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { RequestWithAuth } from "../interface/auth.interfaces";
 import { getPublicationUploadFiles } from "../middlewares/publicationUpload.middleware";
-import { AppError } from "../error";
 import {
   createPublicationService,
   deletePublicationService,
@@ -11,16 +10,7 @@ import {
   removePublicationImageService,
   updatePublicationService,
 } from "../services/publications.services";
-import { broadcastPublicationCreated } from "../services/resendNewsletter.service";
-
-const isProviderError = (
-  error: unknown,
-): error is { message: string; name: string; statusCode: number | null } =>
-  typeof error === "object" &&
-  error !== null &&
-  "message" in error &&
-  "name" in error &&
-  "statusCode" in error;
+import { enqueuePublicationBroadcastJob } from "../services/emailQueue.services";
 
 export const createPublicationController = async (
   request: Request,
@@ -34,22 +24,15 @@ export const createPublicationController = async (
   );
 
   try {
-    await broadcastPublicationCreated(publication);
+    await enqueuePublicationBroadcastJob(publication);
   } catch (error) {
-    // A falha no broadcast nao pode desfazer a publication ja persistida.
-    // A broadcast failure must not roll back an already persisted publication.
-    console.error("Publication newsletter broadcast error:", {
-      operation: "broadcastPublicationCreated",
+    // A falha ao enfileirar o broadcast nao pode desfazer a publication ja persistida.
+    // Failing to enqueue the broadcast must not roll back an already persisted publication.
+    console.error("Publication newsletter queue error:", {
+      operation: "enqueuePublicationBroadcastJob",
       publicationId: publication.id,
       slug: publication.slug,
-      providerCode: isProviderError(error) ? error.name : undefined,
-      statusCode: error instanceof AppError ? error.statusCode : undefined,
-      providerStatusCode: isProviderError(error) ? error.statusCode : undefined,
-      message: isProviderError(error)
-        ? error.message
-        : error instanceof Error
-          ? error.message
-          : "Unknown error",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 

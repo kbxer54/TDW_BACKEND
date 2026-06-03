@@ -1,11 +1,13 @@
 import app from "./app";
 import { AppDataSource } from "./data-source";
+import { startEmailQueueWorker } from "./services/emailQueue.services";
 
 const PORT = process.env.PORT || 3000;
 
 AppDataSource.initialize()
   .then(() => {
     console.log("Database connected successfully");
+    startEmailQueueWorker();
 
     console.log(`Server is running on http://localhost:${PORT}`);
     app.listen(PORT, () => {
