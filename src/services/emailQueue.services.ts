@@ -103,11 +103,19 @@ const isResendError = (error: unknown): error is ResendErrorResponse =>
   "name" in error &&
   "statusCode" in error;
 
-const isRateLimitError = (error: unknown): boolean =>
-  isResendError(error) &&
-  (error.statusCode === 429 ||
-    error.name === "rate_limit_exceeded" ||
-    error.name === "daily_quota_exceeded");
+const isRateLimitError = (error: unknown): boolean => {
+  if (!isResendError(error)) {
+    return false;
+  }
+
+  const errorName = String(error.name);
+
+  return (
+    error.statusCode === 429 ||
+    errorName === "rate_limit_exceeded" ||
+    errorName === "daily_quota_exceeded"
+  );
+};
 
 const getRetryDelayMinutes = (attempts: number, error: unknown): number => {
   if (isRateLimitError(error)) {
